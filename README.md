@@ -1,5 +1,13 @@
 # ORB-SLAM3
-You need to clone and place [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) under `third_party/ORB_SLAM3`. Follow the official documentation on how to build ORB-SLAM3.
+[ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) is tracked as a git submodule at `third_party/ORB-SLAM3`.
+
+Initialize it after cloning this repository:
+
+```bash
+git submodule update --init --recursive third_party/ORB-SLAM3
+```
+
+Follow the official ORB-SLAM3 documentation to build the submodule.
 
 # ORB-SLAM3 on OmniWorld
 

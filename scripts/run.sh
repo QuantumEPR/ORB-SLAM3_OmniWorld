@@ -9,7 +9,7 @@ cd "${REPO_ROOT}"
 
 export CONDA_PREFIX="${ENV_PREFIX}"
 export PATH="${ENV_PREFIX}/bin:${PATH}"
-export LD_LIBRARY_PATH="${REPO_ROOT}/third_party/install/pangolin/lib:${REPO_ROOT}/third_party/ORB_SLAM3/lib:${ENV_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
+export LD_LIBRARY_PATH="${REPO_ROOT}/third_party/install/pangolin/lib:${REPO_ROOT}/third_party/ORB-SLAM3/lib:${ENV_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
 
 RUN_ID="${RUN_ID:-$(date +%Y%m%d_%H%M%S)}"
 JOBS="${JOBS:-8}"

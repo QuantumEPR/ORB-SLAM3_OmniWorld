@@ -14,7 +14,7 @@ DEFAULT_DATASET_ROOT = REPO_ROOT / "data" / "OmniWorld"
 if not DEFAULT_DATASET_ROOT.exists():
     DEFAULT_DATASET_ROOT = Path("/data2/zhewenz/datasets/OmniWorld")
 DEFAULT_METADATA_CSV = REPO_ROOT / "OmniWorld" / "omniworld_game_metadata.csv"
-ORB_SLAM3_DIR = REPO_ROOT / "third_party" / "ORB_SLAM3"
+ORB_SLAM3_DIR = REPO_ROOT / "third_party" / "ORB-SLAM3"
 
 THREAD_ENV = {
     "OMP_NUM_THREADS": "1",
