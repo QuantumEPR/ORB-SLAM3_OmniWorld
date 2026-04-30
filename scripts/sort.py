@@ -33,7 +33,11 @@ keys = [
 "f411e68095c7",
 ]
 
-df = pd.read_csv("analysis/benchmarks/20260429_194249.csv")
+INPUT_CSV = "analysis/benchmarks/20260429_194249/20260429_194249.csv"
+OUTPUT_CSV = "analysis/benchmarks/20260429_194249/per_scene.csv"
+SUMMARY_CSV = "analysis/benchmarks/20260429_194249/overall_avg.csv"
+
+df = pd.read_csv(INPUT_CSV)
 
 rank = {key: i for i, key in enumerate(keys)}
 
@@ -50,9 +54,25 @@ METRIC_COLUMNS = [
 
 
 def frame_weighted_average(group: pd.DataFrame, column: str) -> float:
-    valid = group[column].notna()
+    valid = group[column].notna() & group["frame_count"].notna()
     values = group.loc[valid, column]
     weights = group.loc[valid, "frame_count"]
+
+    if weights.sum() == 0:
+        return float("nan")
+
+    return (values * weights).sum() / weights.sum()
+
+
+def valid_split_count(group: pd.DataFrame, column: str) -> int:
+    valid = group[column].notna() & group["frame_count"].notna()
+    return group.loc[valid, "split_idx"].nunique()
+
+
+def split_count_weighted_average(scene_df: pd.DataFrame, value_column: str, weight_column: str) -> float:
+    valid = scene_df[value_column].notna() & scene_df[weight_column].gt(0)
+    values = scene_df.loc[valid, value_column]
+    weights = scene_df.loc[valid, weight_column]
 
     if weights.sum() == 0:
         return float("nan")
@@ -71,28 +91,48 @@ for scene_id, group in mono.groupby("scene_id", sort=False):
 
     for column in METRIC_COLUMNS:
         row[column] = frame_weighted_average(group, column)
+        row[f"{column}_valid_splits"] = valid_split_count(group, column)
 
     rows.append(row)
 
 out = pd.DataFrame(
     rows,
-    columns=["scene_id", "num_splits", *METRIC_COLUMNS],
+    columns=[
+        "scene_id",
+        "num_splits",
+        "ate_rmse_m",
+        "ate_rmse_m_valid_splits",
+        "rpe_trans_rmse_m",
+        "rpe_trans_rmse_m_valid_splits",
+        "rpe_rot_rmse_deg",
+        "rpe_rot_rmse_deg_valid_splits",
+    ],
 )
 
-OUTPUT_CSV = "per_scene.csv"
 out.to_csv(OUTPUT_CSV, index=False, float_format="%.4f", sep="&")
 
-SUMMARY_CSV = "overall_avg.csv"
 summary = pd.DataFrame(
     [
         {
-            "avg_ate": out["ate_rmse_m"].mean(),
-            "avg_rpe_t": out["rpe_trans_rmse_m"].mean(),
-            "avg_rpe_r": out["rpe_rot_rmse_deg"].mean(),
+            "avg_ate": split_count_weighted_average(
+                out,
+                "ate_rmse_m",
+                "ate_rmse_m_valid_splits",
+            ),
+            "avg_rpe_t": split_count_weighted_average(
+                out,
+                "rpe_trans_rmse_m",
+                "rpe_trans_rmse_m_valid_splits",
+            ),
+            "avg_rpe_r": split_count_weighted_average(
+                out,
+                "rpe_rot_rmse_deg",
+                "rpe_rot_rmse_deg_valid_splits",
+            ),
         }
     ]
 )
-summary.to_csv(SUMMARY_CSV, index=False, float_format="%.4f", sep="&")
+summary.to_csv(SUMMARY_CSV, index=False, float_format="%.4f")
 
 print(f"Wrote {len(out)} rows to {OUTPUT_CSV}")
 print(f"Wrote averages to {SUMMARY_CSV}")
