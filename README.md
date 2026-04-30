@@ -1,3 +1,6 @@
+# ORB-SLAM3
+You need to clone and place [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) under `third_party/ORB_SLAM3`. Follow the official documentation on how to build ORB-SLAM3.
+
 # ORB-SLAM3 on OmniWorld
 
 The active benchmark path is intentionally small:
